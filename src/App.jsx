@@ -7,11 +7,11 @@ function App() {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const newMessage = { from: "user", text: input };
-    setMessages((prev) => [...prev, newMessage]);
+    // Add user message
+    setMessages((prev) => [...prev, { from: "user", text: input }]);
 
     try {
-      const res = await fetch(import.meta.env.VITE_BACKEND_URL, {
+      const response = await fetch("https://bhashwaveai.onrender.com/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -19,18 +19,21 @@ function App() {
         body: JSON.stringify({ user_input: input }),
       });
 
-      const data = await res.json();
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
 
+      const data = await response.json();
       setMessages((prev) => [
         ...prev,
-        { from: "bot", text: data.reply || "कोई जवाब नहीं मिला।" },
+        { from: "bot", text: data.reply || "❓ कोई जवाब नहीं मिला।" },
       ]);
     } catch (err) {
+      console.error("❌ Fetch error:", err);
       setMessages((prev) => [
         ...prev,
         { from: "bot", text: "❌ सर्वर से कनेक्ट नहीं हो पाया।" },
       ]);
-      console.error("Error:", err);
     }
 
     setInput("");
@@ -38,11 +41,12 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4">🗣️ BhashaWae AI</h1>
+      <h1 className="text-2xl font-bold mb-4">🗣️ Bhashwave AI</h1>
+
       <div className="w-full max-w-md space-y-2 mb-4">
-        {messages.map((msg, i) => (
+        {messages.map((msg, idx) => (
           <div
-            key={i}
+            key={idx}
             className={`p-2 rounded ${
               msg.from === "user"
                 ? "bg-blue-100 text-right"
@@ -53,6 +57,7 @@ function App() {
           </div>
         ))}
       </div>
+
       <div className="flex gap-2 w-full max-w-md">
         <input
           type="text"
