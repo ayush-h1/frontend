@@ -11,7 +11,7 @@ function App() {
     setMessages((prev) => [...prev, newMessage]);
 
     try {
-      const res = await fetch(''https://bhashwaveai-2.onrender.com/chat', {
+      const res = await fetch('https://bhashwaveai-2.onrender.com/chat', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
